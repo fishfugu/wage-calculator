@@ -5,6 +5,21 @@
     <style type="text/css">
       /* Lit v0.1 */
 
+body {
+	background-color: black;
+	color: white;
+}
+
+input{
+	background-color: rgb(40, 40, 40);
+	color: white;
+}
+
+#mgmt-loss-total,
+#union-loss-total{
+	background-color: rgb(255, 255, 255);
+	color: black;
+}
 
 :root {
     --font: nunito;
@@ -126,9 +141,9 @@ a {
 
 td,
 th {
-    padding: 1em;
+    padding: 5px;
     text-align: left;
-    border-bottom: solid var(--light);
+	border-bottom: 2px solid grey;
 }
 
 .btn {
@@ -161,10 +176,10 @@ table {
      </style>
 
     <script>
-      const mgmtPayRise = [3, 3, 3];
-      const unionPayRise = [6, 6, 6];
+	  const mgmtSignUpBonusFloat = 750.0;
+      const mgmtPayRise = [3.5, 3.0, 2.5];
+      const unionPayRise = [6.0, 6.0, 6.0];
       const inflationRate = [7.75, 5.5, 2.75];
-
       
 
       document.addEventListener("DOMContentLoaded", function(event) {
@@ -172,6 +187,7 @@ table {
 	  const mgmtPayRise2022El = document.getElementById('mgmt-pay-rise-2022');
 	  const mgmtPayRise2023El = document.getElementById('mgmt-pay-rise-2023');
 	  const mgmtPayRise2024El = document.getElementById('mgmt-pay-rise-2024');
+	  const mgmtSignUpBonus = document.getElementById('mgmt-sign-up-bonus');
 
 	  const unionPayRise2022El = document.getElementById('union-pay-rise-2022');
 	  const unionPayRise2023El = document.getElementById('union-pay-rise-2023');
@@ -206,6 +222,7 @@ table {
 	  mgmtPayRise2022El.value = mgmtPayRise[0];
 	  mgmtPayRise2023El.value = mgmtPayRise[1];
 	  mgmtPayRise2024El.value = mgmtPayRise[2];
+	  mgmtSignUpBonus.value = '$750.00';
 
 	  unionPayRise2022El.value = unionPayRise[0];
 	  unionPayRise2023El.value = unionPayRise[1];
@@ -246,8 +263,8 @@ table {
 		  return;
 	      }
 
-	      const mgmtWage2022 = parseFloat(wage) * (1 + parseFloat(mgmtPayRise2022El.value) / 100) / (1 + parseFloat(inflation2022El.value) / 100);
-	      const mgmtWage2023 = mgmtWage2022 * (1 + parseFloat(mgmtPayRise2023El.value) / 100) / (1 + parseFloat(inflation2023El.value) / 100);
+	      const mgmtWage2022 = (parseFloat(wage) * (1 + parseFloat(mgmtPayRise2022El.value) / 100) / (1 + parseFloat(inflation2022El.value) / 100)) + mgmtSignUpBonusFloat;
+	      const mgmtWage2023 = (mgmtWage2022 - mgmtSignUpBonusFloat) * (1 + parseFloat(mgmtPayRise2023El.value) / 100) / (1 + parseFloat(inflation2023El.value) / 100);
 	      const mgmtWage2024 = mgmtWage2023 * (1 + parseFloat(mgmtPayRise2024El.value) / 100) / (1 + parseFloat(inflation2024El.value) / 100);
 	      mgmtWage2022El.value =  formatter.format(mgmtWage2022);
 	      mgmtWage2023El.value =  formatter.format(mgmtWage2023);
@@ -305,15 +322,20 @@ table {
 
       <table>
       <tr>
-	<td colspan="3">
-	    <label for="current-wage">Current Wage</label>
+	<td colspan="2">
+
+	</td>
+	<td>
+		<img src="img/logo.png" width="200px"/>
 	</td>
       </tr>
       <tr>
-	<td colspan="3">
+	<td>
+	    <label for="current-wage">Enter Your Current Wage</label><br/>
 	    <input type="text" id="current-wage">
-	    <br>
-	    * For your privacy all calculations are done using your computer.
+	</td>
+	<td colspan="2">
+		* For your privacy all calculations are done using your computer.
 	    <br>
 	    No information entered into this form is sent to another computer.
 	</td>
@@ -333,7 +355,7 @@ table {
 	</tr>
 
 	<tr>
-	  <td colspan="3">
+	  <td colspan="3" style="border-bottom: 0px;">
 	    Management Proposed Pay-Rise (%)
 	  </td>
 	</tr>
@@ -348,10 +370,14 @@ table {
 	  <td>
 	    <input type="text" id="mgmt-pay-rise-2024" readonly="true">
 	  </td>
+	  <td>
+		Sign-up bonus
+	    <input type="text" id="mgmt-sign-up-bonus" readonly="true">
+	  </td>
 	</tr>
 
 	<tr>
-	  <td colspan="3">
+	  <td colspan="3" style="border-bottom: 0px;">
 	    Union Proposed Pay-Rise (%)
 	  </td>
 	</tr>
@@ -369,7 +395,7 @@ table {
 	</tr>
 
 	<tr>
-	  <td colspan="3">
+	  <td colspan="3" style="border-bottom: 0px;">
 	    Inflation rate (prediction) (%)
 	  </td>
 	</tr>
@@ -387,7 +413,7 @@ table {
 	</tr>
 
 	<tr>
-	  <td colspan="3">
+	  <td colspan="3" style="border-bottom: 0px;">
 	    Inflation Adjusted Wage - Management Offer
 	  </td>
 	</tr>
@@ -405,7 +431,7 @@ table {
 	</tr>
 
 	<tr>
-	  <td colspan="3">
+	  <td colspan="3" style="border-bottom: 0px;">
 	    Inflation Adjusted Wage - Union Claim
 	  </td>
 	</tr>
@@ -424,11 +450,11 @@ table {
 
 
 	<tr>
-	  <td colspan="3">
+	  <td colspan="3" style="border-bottom: 0px;">
 	    REAL Loss - Management Offer
 	  </td>
-	  <td>
-	    REAL Loss over 3 years
+	  <td style="border-bottom: 0px; color: red;">
+	    REAL Loss over 3 years <br/> Management Offer
 	  </td>
 	</tr>
 
@@ -448,11 +474,11 @@ table {
 	</tr>
 
 	<tr>
-	  <td colspan="3">
+	  <td colspan="3" style="border-bottom: 0px;">
 	    REAL Loss - Union Offer
 	  </td>
-	  <td>
-	    REAL Loss over 3 years
+	  <td style="border-bottom: 0px; color: red;">
+	    REAL Loss over 3 years <br/> Union Offer
 	  </td>
 	</tr>
 
@@ -473,8 +499,9 @@ table {
 	</table>
 
 	<p id="comparison-text">
-	The Management offer means you lose <span id="comparison"></span> times more money than the union claim over the 3 years of the agreement
-	</p>
+		The Management offer means you lose <span id="comparison"></span> times more money than the union claim over the 3 years of the agreement
+		</p>
+
     </form>
 
   </body>
