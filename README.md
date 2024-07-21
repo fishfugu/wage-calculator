@@ -22,4 +22,4 @@ The primary goal of this calculator is to demystify the numbers and empower our 
 
 While the active development phase of this tool has concluded, the repository remains available for historical reference and potential future use. It stands as a testament to the power of collective action and the importance of transparency in negotiations.
 
-We encourage other union members and organizations to adapt this tool for their own needs, continuing the spirit of empowerment and informed decision-making.
+We encourage other union members and organisations to adapt this tool for their own needs, continuing the spirit of empowerment and informed decision-making.
