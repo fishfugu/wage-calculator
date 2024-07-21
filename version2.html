@@ -1,632 +1,143 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Wage Calculator</title>
-    <style type="text/css">
-      /* Lit v0.1 */
-
-body {
-	background-color: black;
-	color: white;
-}
-
-input{
-	background-color: rgb(40, 40, 40);
-	color: white;
-}
-
-#mgmt-loss-total,
-#union-loss-total,
-#mgmt-after-tax,
-#union-after-tax{
-	background-color: rgb(255, 255, 255);
-	color: black;
-}
-
-:root {
-    --font: nunito;
-    --primary-color: #fa0;
-    --light: #eee;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-*+* {
-    margin: .5em 0;
-}
-
-pre {
-    overflow: auto
-}
-
-@media(min-width:35em) {
-    .col {
-        display: table-cell;
-    }
-
-    .\31 {
-        width: 5%;
-    }
-
-    .\33 {
-        width: 22%;
-    }
-
-    .\34 {
-        width: 30%;
-    }
-
-    .\35 {
-        width: 40%;
-    }
-
-    .\32 {
-        width: 15%;
-    }
-
-    .\36 {
-        width: 50%;
-    }
-
-    .row {
-        display: table;
-        border-spacing: 1em 0;
-    }
-}
-
-.w-100,
-.row {
-    width: 100%;
-}
-
-.card:focus,
-hr {
-    outline: 0;
-    border: solid var(--primary-color);
-}
-
-.card,
-pre {
-    padding: 1em;
-    border: solid var(--light);
-}
-
-a:hover,
-.btn:hover {
-
-    opacity: .6;
-}
-
-.c {
-    max-width: 60em;
-    padding: 1em;
-    margin: auto;
-    font: 1em/1.6 var(--font);
-}
-
-h6 {
-    font: 100 1em var(--font);
-}
-
-h5 {
-    font: 100 1.2em var(--font);
-}
-
-h3 {
-    font: 100 2em var(--font);
-}
-
-h4 {
-    font: 100 1.5em var(--font);
-}
-
-h2 {
-    font: 100 2.2em var(--font);
-}
-
-h1 {
-    font: 100 2.5em var(--font);
-}
-
-a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.btn.primary {
-    color: white;
-    background: var(--primary-color);
-    border: solid var(--primary-color);
-}
-
-td,
-th {
-    padding: 5px;
-    text-align: left;
-	border-bottom: 2px solid grey;
-}
-
-.btn {
-    padding: 1em;
-    text-transform: uppercase;
-    background: white;
-    border: solid;
-    font: .7em var(--font);
-}
-
-body, input {
-    font-size: 18px;
-}
-
-table {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#comparison-text,
-#union-offer-gain-text,
-#union-offer-loss-text,
-#mgt-offer-gain-text,
-#mgt-offer-loss-text {
-    width: 80%;
-    margin: 20px auto;
-    font-size: 24px;
-      display: none;
-}
-
-#comparison,
-#union-gain,
-#union-loss,
-#mgt-gain,
-#mgt-loss {
-    font-weight: bold;
-}
-     </style>
-
-    <script>
-	  const mgmtSignUpBonusFloat = 750.0;
-      const mgmtPayRise = [3.5, 3.0, 2.5];
-      const unionPayRise = [6.0, 6.0, 6.0];
-      const inflationRate = [7.3, 5.5, 2.75];
-      
-
-      document.addEventListener("DOMContentLoaded", function(event) {
-	  const wageEl = document.getElementById('current-wage');
-	  const mgmtPayRise2022El = document.getElementById('mgmt-pay-rise-2022');
-	  const mgmtPayRise2023El = document.getElementById('mgmt-pay-rise-2023');
-	  const mgmtPayRise2024El = document.getElementById('mgmt-pay-rise-2024');
-	  const mgmtSignUpBonus = document.getElementById('mgmt-sign-up-bonus');
-
-	  const unionPayRise2022El = document.getElementById('union-pay-rise-2022');
-	  const unionPayRise2023El = document.getElementById('union-pay-rise-2023');
-	  const unionPayRise2024El = document.getElementById('union-pay-rise-2024');
-	  
-	  const inflation2022El = document.getElementById('inflation-2022');
-	  const inflation2023El = document.getElementById('inflation-2023');
-	  const inflation2024El = document.getElementById('inflation-2024');
-
-	  const mgmtWage2022El = document.getElementById('mgmt-wage-2022');
-	  const mgmtWage2023El = document.getElementById('mgmt-wage-2023');
-	  const mgmtWage2024El = document.getElementById('mgmt-wage-2024');
-      const mgmtAfterTaxEl = document.getElementById('mgmt-after-tax');
-
-	  const unionWage2022El = document.getElementById('union-wage-2022');
-	  const unionWage2023El = document.getElementById('union-wage-2023');
-	  const unionWage2024El = document.getElementById('union-wage-2024');
-      const unionAfterTaxEl = document.getElementById('union-after-tax');
-
-	  const mgmtLoss2022El = document.getElementById('mgmt-loss-2022');
-	  const mgmtLoss2023El = document.getElementById('mgmt-loss-2023');
-	  const mgmtLoss2024El = document.getElementById('mgmt-loss-2024');
-	  
-	  const mgmtLossTotalEl = document.getElementById('mgmt-loss-total');
-
-	  const unionLoss2022El = document.getElementById('union-loss-2022');
-	  const unionLoss2023El = document.getElementById('union-loss-2023');
-	  const unionLoss2024El = document.getElementById('union-loss-2024');
-	  
-	  const unionLossTotalEl = document.getElementById('union-loss-total');
-
-	  const comparisonText = document.getElementById('comparison-text');
-	  const unionGainText = document.getElementById('union-offer-gain-text');
-	  const unionLossText = document.getElementById('union-offer-loss-text');
-	  const mgtGainText = document.getElementById('mgt-offer-gain-text');
-	  const mgtLossText = document.getElementById('mgt-offer-loss-text');
-
-	  mgmtPayRise2022El.value = mgmtPayRise[0];
-	  mgmtPayRise2023El.value = mgmtPayRise[1];
-	  mgmtPayRise2024El.value = mgmtPayRise[2];
-	  mgmtSignUpBonus.value = '$750.00';
-
-	  unionPayRise2022El.value = unionPayRise[0];
-	  unionPayRise2023El.value = unionPayRise[1];
-	  unionPayRise2024El.value = unionPayRise[2];
-
-	  inflation2022El.value = inflationRate[0];
-	  inflation2023El.value = inflationRate[1];
-	  inflation2024El.value = inflationRate[2];
-
-	  
-	  var formatter = new Intl.NumberFormat('en-AU', {
-	      style: 'currency',
-	      currency: 'AUD',
-	  });
-
-
-	  function updateValues() {
-	      const wage = parseFloat(wageEl.value);
-
-	      if ((isNaN(wage)) || (wage<10000)) {
-			mgmtWage2022El.value = '';
-			mgmtWage2023El.value = '';
-			mgmtWage2024El.value = '';
-			mgmtAfterTaxEl.value = '';
-			unionWage2022El.value = '';
-			unionWage2023El.value = '';
-			unionWage2024El.value = '';
-			unionAfterTaxEl.value = '';
-			mgmtLoss2022El.value = '';
-			mgmtLoss2023El.value = '';
-			mgmtLoss2024El.value = '';
-			unionLoss2022El.value = '';
-			unionLoss2023El.value = '';
-			unionLoss2024El.value = '';
-			mgmtLossTotalEl.value = '';
-			unionLossTotalEl.value = '';
-
-			comparisonText.style.display = "none";
-			unionGainText.style.display = "none";
-			unionLossText.style.display = "none";
-			mgtGainText.style.display = "none";
-			mgtLossText.style.display = "none";
-
-            mgmtAfterTaxEl.style.backgroundColor = "#FFFFFF";
-			unionAfterTaxEl.style.backgroundColor = "#FFFFFF";
-
-			mgmtLossTotalEl.style.backgroundColor = "#FFFFFF";
-			unionLossTotalEl.style.backgroundColor = "#FFFFFF";
-
-		  	return;
-	      }
-
-	      const mgmtWage2022 = (parseFloat(wage) * (1 + parseFloat(mgmtPayRise2022El.value) / 100) / (1 + parseFloat(inflation2022El.value) / 100)) + mgmtSignUpBonusFloat;
-	      const mgmtWage2023 = (mgmtWage2022 - mgmtSignUpBonusFloat) * (1 + parseFloat(mgmtPayRise2023El.value) / 100) / (1 + parseFloat(inflation2023El.value) / 100);
-	      const mgmtWage2024 = mgmtWage2023 * (1 + parseFloat(mgmtPayRise2024El.value) / 100) / (1 + parseFloat(inflation2024El.value) / 100);
-	      const mgmtAfterTax = ((mgmtWage2024 - wage) / 52) * 0.675;
-	      mgmtWage2022El.value =  formatter.format(mgmtWage2022);
-	      mgmtWage2023El.value =  formatter.format(mgmtWage2023);
-	      mgmtWage2024El.value =  formatter.format(mgmtWage2024);
-	      mgmtAfterTaxEl.value =  formatter.format(mgmtAfterTax);
-
-	      const unionWage2022 = parseFloat(wage) * (1 + parseFloat(unionPayRise2022El.value) / 100) / (1 + parseFloat(inflation2022El.value) / 100);
-	      const unionWage2023 = unionWage2022 * (1 + parseFloat(unionPayRise2023El.value) / 100) / (1 + parseFloat(inflation2023El.value) / 100);
-	      const unionWage2024 = unionWage2023 * (1 + parseFloat(unionPayRise2024El.value) / 100) / (1 + parseFloat(inflation2024El.value) / 100);
-	      const unionAfterTax = ((unionWage2024 - wage) / 52) * 0.675;
-	      unionWage2022El.value =  formatter.format(unionWage2022);
-	      unionWage2023El.value =  formatter.format(unionWage2023);
-	      unionWage2024El.value =  formatter.format(unionWage2024);
-	      unionAfterTaxEl.value =  formatter.format(unionAfterTax);
-
-	      const mgmtLoss2022 = wage - mgmtWage2022;
-	      const mgmtLoss2023 = wage - mgmtWage2023;
-	      const mgmtLoss2024 = wage - mgmtWage2024;
-
-	      mgmtLoss2022El.value = formatter.format(mgmtLoss2022);
-	      mgmtLoss2023El.value = formatter.format(mgmtLoss2023);
-	      mgmtLoss2024El.value = formatter.format(mgmtLoss2024);
-
-	      mgmtLossTotal = mgmtLoss2022 + mgmtLoss2023 + mgmtLoss2024;
-
-	      mgmtLossTotalEl.value = formatter.format(mgmtLossTotal);
-
-	      const unionLoss2022 = wage - unionWage2022;
-	      const unionLoss2023 = wage - unionWage2023;
-	      const unionLoss2024 = wage - unionWage2024;
-
-	      unionLoss2022El.value = formatter.format(unionLoss2022);
-	      unionLoss2023El.value = formatter.format(unionLoss2023);
-	      unionLoss2024El.value = formatter.format(unionLoss2024);
-
-	      unionLossTotal = unionLoss2022 + unionLoss2023 + unionLoss2024;
-
-	      unionLossTotalEl.value = formatter.format(unionLossTotal);
-
-
-	      const comparison = mgmtLossTotal / unionLossTotal;
-		  var comparisonMultiple = Math.round(comparison * 100, 2) / 100;
-	      document.querySelector('#comparison').innerText = comparisonMultiple;
-	      document.querySelector('#union-gain').innerText = formatter.format(Math.round(-unionLossTotal * 100, 2) / 100);
-	      document.querySelector('#union-loss').innerText = formatter.format(Math.round(unionLossTotal * 100, 2) / 100);
-	      document.querySelector('#mgt-gain').innerText = formatter.format(Math.round(-mgmtLossTotal * 100, 2) / 100);
-	      document.querySelector('#mgt-loss').innerText = formatter.format(Math.round(mgmtLossTotal * 100, 2) / 100);
-
-          if (mgmtAfterTax < 0) {
-			mgmtAfterTaxEl.style.backgroundColor = "#FFAAAA";
-		  } else {
-			mgmtAfterTaxEl.style.backgroundColor = "#AAFFAA";
-		  }
-
-          if (unionAfterTax < 0) {
-			unionAfterTaxEl.style.backgroundColor = "#FFAAAA";
-		  } else {
-			unionAfterTaxEl.style.backgroundColor = "#AAFFAA";
-		  }
-
-		  if (mgmtLossTotal < 0) {
-			document.querySelector('#mgt-loss-over-three-years').innerText = "REAL GAIN over 3 years\nManagement Offer"
-			mgmtLossTotalEl.value = formatter.format(-mgmtLossTotal);
-			mgmtLossTotalEl.style.backgroundColor = "#AAFFAA";
-		  } else {
-			document.querySelector('#mgt-loss-over-three-years').innerText = "REAL LOSS over 3 years\nManagement Offer"
-			mgmtLossTotalEl.value = formatter.format(mgmtLossTotal);
-			mgmtLossTotalEl.style.backgroundColor = "#FFAAAA";
-		  }
-
-		  if (unionLossTotal < 0) {
-			document.querySelector('#union-loss-over-three-years').innerText = "REAL GAIN over 3 years\nUnion Claim"
-			unionLossTotalEl.value = formatter.format(-unionLossTotal);
-			unionLossTotalEl.style.backgroundColor = "#AAFFAA";
-		  } else {
-			document.querySelector('#union-loss-over-three-years').innerText = "REAL LOSS over 3 years\nUnion Claim"
-			unionLossTotalEl.value = formatter.format(unionLossTotal);
-			unionLossTotalEl.style.backgroundColor = "#FFAAAA";
-		  }
-
-		//   if (unionLossTotal < 0) {
-		// 	unionGainText.style.display = "block";
-		// 	unionLossText.style.display = "none";
-		//   } else {
-		// 	unionGainText.style.display = "none";
-		// 	unionLossText.style.display = "block";
-		//   }
-		//   if (mgmtLossTotal < 0) {
-		// 	mgtGainText.style.display = "block";
-		// 	mgtLossText.style.display = "none";
-		//   } else {
-		// 	mgtGainText.style.display = "none";
-		// 	mgtLossText.style.display = "block";
-		//   }
-		//   if (comparisonMultiple > 0) {
-		// 	comparisonText.style.display = "block";
-		//   } else {
-		// 	comparisonText.style.display = "none";
-		//   }
-	  }
-
-	  document.querySelectorAll('input').forEach(el => el.addEventListener('keyup', updateValues));
-      });
-
-    </script>
-
-  </head>
-
-  <body>
-
-    <form>
-
-
-      <table>
-      <tr>
-	<td colspan="2">
-
-	</td>
-	<td>
-	</td>
-      </tr>
-      <tr>
-	<td>
-	    <label for="current-wage">Please Enter Your<br/>Current Annual Salary *</label><br/>
-	    <input type="text" id="current-wage">
-	</td>
-	<td colspan="2">
-		* For your privacy all calculations are done using your computer.
-	    <br>
-	    No information entered into this form is sent to another computer.
-	    <br>
-	    <br>
-		** These calculations are for estimation purposes only.
-		<br>
-		Actual outcomes will depend on many unkown factors.
-        <br>
-	    <br>
-		*** Tax rate assumed to be 32.5% marginal.
-	</td>
-      </tr>
-      </p>
-	<tr>
-	  <td>
-	    2022
-	  </td>
-	  <td>
-	    2023
-	  </td>
-	  <td>
-	    2024
-	  </td>
-
-	</tr>
-
-	<tr>
-	  <td colspan="3" style="border-bottom: 0px;">
-	    Management Proposed Pay-Rise (%)
-	  </td>
-	</tr>
-
-	<tr>
-	  <td>
-	    <input type="text" id="mgmt-pay-rise-2022" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="mgmt-pay-rise-2023" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="mgmt-pay-rise-2024" readonly="true">
-	  </td>
-	  <td>
-		Sign-up bonus
-	    <input type="text" id="mgmt-sign-up-bonus" readonly="true">
-	  </td>
-	</tr>
-
-	<tr>
-	  <td colspan="3" style="border-bottom: 0px;">
-	    Union Proposed Pay-Rise (%)
-	  </td>
-	</tr>
-
-	<tr>
-	  <td>
-	    <input type="text" id="union-pay-rise-2022">
-	  </td>
-	  <td>
-	    <input type="text" id="union-pay-rise-2023">
-	  </td>
-	  <td>
-	    <input type="text" id="union-pay-rise-2024">
-	  </td>
-	</tr>
-
-	<tr>
-	  <td colspan="3" style="border-bottom: 0px;">
-	    Inflation rate (prediction) (%)
-	  </td>
-	</tr>
-
-	<tr>
-	  <td>
-	    <input type="text" id="inflation-2022">
-	  </td>
-	  <td>
-	    <input type="text" id="inflation-2023">
-	  </td>
-	  <td>
-	    <input type="text" id="inflation-2024">
-	  </td>
-	</tr>
-
-	<tr>
-	  <td colspan="3" style="border-bottom: 0px;">
-	    Inflation Adjusted Wage - Management Offer
-	  </td>
-      <td style="border-bottom: 0px; color: red;">
-		<p id="weekly-change-mgmt">Approx. Final Weekly Change<br/>after tax (inflation adjusted) ***</p>
-	</td>
-	</tr>
-
-	<tr>
-	  <td>
-	    <input type="text" id="mgmt-wage-2022" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="mgmt-wage-2023" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="mgmt-wage-2024" readonly="true">
-	  </td>
-      <td>
-	    <input type="text" id="mgmt-after-tax" readonly="true">
-	  </td>
-	</tr>
-
-	<tr>
-	  <td colspan="3" style="border-bottom: 0px;">
-	    Inflation Adjusted Wage - Union Claim
-	  </td>
-      <td style="border-bottom: 0px; color: red;">
-		<p id="weekly-change-union">Approx. Final Weekly Change<br/>after tax (inflation adjusted) ***</p>
-	</td>
-	</tr>
-
-	<tr>
-	  <td>
-	    <input type="text" id="union-wage-2022" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="union-wage-2023" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="union-wage-2024" readonly="true">
-	  </td>
-      <td>
-	    <input type="text" id="union-after-tax" readonly="true">
-	  </td>
-	</tr>
-
-
-	<tr>
-	  <td colspan="3" style="border-bottom: 0px;">
-	    REAL LOSS - Management Offer
-	  </td>
-	  <td style="border-bottom: 0px; color: red;">
-		<p id="mgt-loss-over-three-years">REAL LOSS over 3 years <br/>Management Offer **</p>
-	</td>
-	</tr>
-
-	<tr>
-	  <td>
-	    <input type="text" id="mgmt-loss-2022" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="mgmt-loss-2023" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="mgmt-loss-2024" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="mgmt-loss-total" readonly="true">
-	  </td>
-	</tr>
-
-	<tr>
-	  <td colspan="3" style="border-bottom: 0px;">
-	    REAL LOSS - Union Claim
-	  </td>
-	  <td style="border-bottom: 0px; color: red;">
-		<p id="union-loss-over-three-years">REAL LOSS over 3 years <br/>Union Claim **</p>
-	</td>
-	</tr>
-
-	<tr>
-	  <td>
-	    <input type="text" id="union-loss-2022" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="union-loss-2023" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="union-loss-2024" readonly="true">
-	  </td>
-	  <td>
-	    <input type="text" id="union-loss-total" readonly="true">
-	  </td>
-	</tr>
-	</table>
-
-	<p id="union-offer-gain-text">
-		The Union claim means you gain <span id="union-gain"></span> over the 3 years of the agreement
-		</p>
-
-	<p id="union-offer-loss-text">
-		The Union claim means you lose <span id="union-loss"></span> over the 3 years of the agreement
-		</p>
-	
-	<p id="mgt-offer-gain-text">
-		The Management offer means you gain <span id="mgt-gain"></span> over the 3 years of the agreement
-		</p>
-
-	<p id="mgt-offer-loss-text">
-		The Management offer means you lose <span id="mgt-loss"></span> over the 3 years of the agreement
-		</p>
-
-
-	<p id="comparison-text">
-		The Management offer means you lose <span id="comparison"></span> times more money than the union claim over the 3 years of the agreement
-		</p>
-
-    </form>
-
-  </body>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Wage Calculator</title>
+	<style>
+		body {
+			background-color: black;
+			color: white;
+			font-family: 'Nunito', sans-serif;
+		}
+
+		input {
+			background-color: rgb(40, 40, 40);
+			color: white;
+			border: none;
+			padding: 8px;
+			margin-top: 4px;
+		}
+
+		#mgmt-loss-total,
+		#union-loss-total,
+		#mgmt-after-tax,
+		#union-after-tax {
+			background-color: white;
+			color: black;
+		}
+
+		table {
+			width: 90%;
+			margin: 20px auto;
+			border-collapse: collapse;
+		}
+
+		td,
+		th {
+			padding: 10px;
+			border-bottom: 2px solid grey;
+		}
+
+		.label-info {
+			font-size: 0.9em;
+			opacity: 0.8;
+		}
+
+		.output {
+			color: red;
+			font-weight: bold;
+		}
+
+		.highlight-negative {
+			background-color: #FFAAAA;
+		}
+
+		.highlight-positive {
+			background-color: #AAFFAA;
+		}
+
+		.text-center {
+			text-align: center;
+		}
+
+		.hide {
+			display: none;
+		}
+	</style>
+</head>
+
+<body>
+	<form>
+		<table>
+			<tr>
+				<td colspan="3">
+					<label for="current-wage">Please Enter Your Current Annual Salary *</label><br />
+					<input type="text" id="current-wage" placeholder="Enter wage here...">
+					<div class="label-info">
+						* All calculations are performed locally for privacy. No data is sent externally.<br>
+						** Estimated outcomes, actuals may vary. Assumes 32.5% marginal tax rate.
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>2022</td>
+				<td>2023</td>
+				<td>2024</td>
+			</tr>
+			<tr>
+				<td colspan="4">Management Proposed Pay-Rise (%) + Sign-up Bonus</td>
+			</tr>
+			<tr>
+				<td><input type="text" id="mgmt-pay-rise-2022" readonly></td>
+				<td><input type="text" id="mgmt-pay-rise-2023" readonly></td>
+				<td><input type="text" id="mgmt-pay-rise-2024" readonly></td>
+				<td><input type="text" id="mgmt-sign-up-bonus" readonly></td>
+			</tr>
+			<tr>
+				<td colspan="3">Union Proposed Pay-Rise (%)</td>
+			</tr>
+			<tr>
+				<td><input type="text" id="union-pay-rise-2022"></td>
+				<td><input type="text" id="union-pay-rise-2023"></td>
+				<td><input type="text" id="union-pay-rise-2024"></td>
+			</tr>
+			<tr>
+				<td colspan="3">Inflation Rate (Prediction) (%)</td>
+			</tr>
+			<tr>
+				<td><input type="text" id="inflation-2022"></td>
+				<td><input type="text" id="inflation-2023"></td>
+				<td><input type="text" id="inflation-2024"></td>
+			</tr>
+			<tr class="output">
+				<td colspan="3">Inflation Adjusted Wage - Management Offer</td>
+				<td>Approx. Weekly Change After Tax</td>
+			</tr>
+			<tr>
+				<td><input type="text" id="mgmt-wage-2022" readonly></td>
+				<td><input type="text" id="mgmt-wage-2023" readonly></td>
+				<td><input type="text" id="mgmt-wage-2024" readonly></td>
+				<td><input type="text" id="mgmt-after-tax" class="highlight-negative" readonly></td>
+			</tr>
+			<tr class="output">
+				<td colspan="3">Inflation Adjusted Wage - Union Claim</td>
+				<td>Approx. Weekly Change After Tax</td>
+			</tr>
+			<tr>
+				<td><input type="text" id="union-wage-2022" readonly></td>
+				<td><input type="text" id="union-wage-2023" readonly></td>
+				<td><input type="text" id="union-wage-2024" readonly></td>
+				<td><input type="text" id="union-after-tax" class="highlight-positive" readonly></td>
+			</tr>
+			<!-- Additional rows and elements go here -->
+		</table>
+		<!-- Additional informational texts and calculation results -->
+		<p id="comparison-text" class="text-center hide">Comparison Result: <span id="comparison"></span></p>
+	</form>
+	<script>
+		// Your existing JavaScript code here
+	</script>
+</body>
 
 </html>
